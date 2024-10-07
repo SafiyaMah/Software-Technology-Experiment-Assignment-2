@@ -1,14 +1,12 @@
 package com.studentproject.project_app.manager;
 
-import com.studentproject.project_app.domain.Poll;
-import com.studentproject.project_app.domain.User;
-import com.studentproject.project_app.domain.Vote;
-import com.studentproject.project_app.domain.VoteOption;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import com.studentproject.project_app.domain.Poll;
+import com.studentproject.project_app.domain.User;
+import com.studentproject.project_app.domain.VoteOption;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.time.Instant;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -22,42 +20,71 @@ public class PollManagerTest {
     }
 
     @Test
-    public void testAddUserAndGetUser() {
-        User user = new User("testUser", "test@example.com");
-        pollManager.addUser(user);
-
-        User retrievedUser = pollManager.getUser("testUser");
-        assertNotNull(retrievedUser);
-        assertEquals("testUser", retrievedUser.getUsername());
-    }
-
-    @Test
     public void testCreatePoll() {
         User user = new User("testUser", "test@example.com");
         pollManager.addUser(user);
 
-        Poll poll = pollManager.createPoll("testUser", "What is your favorite color?", true);
+        Poll poll = pollManager.createPoll("testUser", "What is your favorite color?", true, Instant.now().plusSeconds(3600));
         assertNotNull(poll);
         assertEquals("What is your favorite color?", poll.getQuestion());
         assertEquals(user, poll.getCreator());
     }
 
     @Test
+    public void testCreateVoteOption() {
+        User user = new User("testUser", "test@example.com");
+        pollManager.addUser(user);
+        Poll poll = pollManager.createPoll("testUser", "What is your favorite color?", true, Instant.now().plusSeconds(3600));
+
+        VoteOption voteOption = pollManager.createVoteOption(poll.getId(), "Red", 1);
+        assertNotNull(voteOption);
+        assertEquals("Red", voteOption.getCaption());
+        assertEquals(1, voteOption.getPresentationOrder());
+        assertTrue(poll.getVoteOptions().contains(voteOption));
+    }
+
+    @Test
     public void testCastVote() {
         User user = new User("testUser", "test@example.com");
         pollManager.addUser(user);
+        Poll poll = pollManager.createPoll("testUser", "What is your favorite color?", true, Instant.now().plusSeconds(3600));
+        VoteOption voteOption = pollManager.createVoteOption(poll.getId(), "Red", 1);
 
-        Poll poll = pollManager.createPoll("testUser", "What is your favorite color?", true);
-        Set<VoteOption> voteOptions = new HashSet<>();
-        voteOptions.add(new VoteOption("Red", 1));
-        poll.setVoteOptions(voteOptions);
-
-        Vote vote = new Vote();
-        vote.setVoteOption(voteOptions.iterator().next());
-
-        Vote castVote = pollManager.castVote("testUser", poll.getId(), vote);
-        assertNotNull(castVote);
-        assertEquals(vote.getVoteOption().getCaption(), "Red");
+        assertDoesNotThrow(() -> pollManager.castVote("testUser", poll.getId(), voteOption.getId(), Instant.now()));
         assertEquals(1, poll.getVotes().size());
+    }
+
+    @Test
+    public void testUserNotFound() {
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+            pollManager.createPoll("nonExistentUser", "What is your favorite color?", true, Instant.now().plusSeconds(3600));
+        });
+
+        assertEquals("User not found.", exception.getMessage());
+    }
+
+    @Test
+    public void testPollNotFound() {
+        User user = new User("testUser", "test@example.com");
+        pollManager.addUser(user);
+
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+            pollManager.createVoteOption(99L, "Blue", 1);
+        });
+
+        assertEquals("Poll not found.", exception.getMessage());
+    }
+
+    @Test
+    public void testVoteOptionNotFound() {
+        User user = new User("testUser", "test@example.com");
+        pollManager.addUser(user);
+        Poll poll = pollManager.createPoll("testUser", "What is your favorite color?", true, Instant.now().plusSeconds(3600));
+
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+            pollManager.castVote("testUser", poll.getId(), 99L, Instant.now());
+        });
+
+        assertEquals("Vote option not found.", exception.getMessage());
     }
 }

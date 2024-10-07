@@ -8,6 +8,11 @@ public class User {
     private String username;
     private String email;
 
+    @Override
+    public String toString() {
+        return "User{username='" + username + "', email='" + email + "'}";
+    }
+
     @JsonManagedReference("user-poll")
     private Set<Poll> createdPolls = new HashSet<>();
 

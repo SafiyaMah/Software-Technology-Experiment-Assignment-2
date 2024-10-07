@@ -22,19 +22,17 @@ public class Poll {
     @JsonBackReference("user-poll")
     private User creator;
 
-    public Poll() {
-        this.publishedAt = Instant.now();
-    }
+    public Poll() {}
 
-    public Poll(String question, Instant validUntil, User creator, boolean isPublic) {  // Updated constructor
+    public Poll(String question, Instant validUntil, User creator, boolean isPublic) {
         this.question = question;
         this.publishedAt = Instant.now();
         this.validUntil = validUntil;
         this.creator = creator;
-        this.isPublic = isPublic;  // Set the public/private status
+        this.isPublic = isPublic;
     }
 
-    // Getters and Setters
+    // Getters and setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 
@@ -47,15 +45,16 @@ public class Poll {
     public Instant getValidUntil() { return validUntil; }
     public void setValidUntil(Instant validUntil) { this.validUntil = validUntil; }
 
+    public boolean isPublic() { return isPublic; }
+    public void setPublic(boolean aPublic) { isPublic = aPublic; }
+
+    public User getCreator() { return creator; }
+    public void setCreator(User creator) { this.creator = creator; }
+
     public Set<VoteOption> getVoteOptions() { return voteOptions; }
     public void setVoteOptions(Set<VoteOption> voteOptions) { this.voteOptions = voteOptions; }
 
     public Set<Vote> getVotes() { return votes; }
     public void setVotes(Set<Vote> votes) { this.votes = votes; }
 
-    public User getCreator() { return creator; }
-    public void setCreator(User creator) { this.creator = creator; }
-
-    public boolean isPublic() { return isPublic; }  // Added this getter
-    public void setPublic(boolean isPublic) { this.isPublic = isPublic; }  // Added this setter
 }

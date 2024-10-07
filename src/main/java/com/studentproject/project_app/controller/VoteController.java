@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Set;
 
 @RestController
-@RequestMapping("/polls/{pollId}/votes")
+@RequestMapping("/api/polls/{pollId}/votes")
 public class VoteController {
 
     @Autowired
@@ -17,8 +17,8 @@ public class VoteController {
 
     // Cast a vote
     @PostMapping
-    public Vote castVote(@PathVariable Long pollId, @RequestParam String username, @RequestBody Vote vote) {
-        return pollManager.castVote(username, pollId, vote);
+    public Vote castVote(@PathVariable Long pollId, @RequestParam String username, @RequestParam Long voteOptionId, @RequestBody Vote vote) {
+        return pollManager.castVote(username, pollId, voteOptionId, vote.getPublishedAt());
     }
 
     // Get all votes for a specific poll

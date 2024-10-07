@@ -3,6 +3,7 @@ package com.studentproject.project_app.domain;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 
 public class VoteOption {
+    private Long id;
     private String caption;
     private int presentationOrder;
 
@@ -17,6 +18,9 @@ public class VoteOption {
     }
 
     // Getters and Setters
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
+
     public String getCaption() { return caption; }
     public void setCaption(String caption) { this.caption = caption; }
 
@@ -25,4 +29,5 @@ public class VoteOption {
 
     public Poll getPoll() { return poll; }
     public void setPoll(Poll poll) { this.poll = poll; }
+
 }

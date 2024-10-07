@@ -29,4 +29,5 @@ public class Vote {
 
     public Poll getPoll() { return poll; }
     public void setPoll(Poll poll) { this.poll = poll; }
+
 }
